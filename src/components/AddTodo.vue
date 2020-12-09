@@ -15,19 +15,22 @@
 <script>
 
 import { mapActions} from 'vuex'
+import { ref, getCurrentInstance } from 'vue'
 export default {
     name:"AddTodo",
-    data() {
-        return {
-            title: ""
-        }
-    },
-    methods: {
-        ...mapActions(["addTodo"]),
-        onSubmit() {
-            this.addTodo(this.title)
+    setup(props) {
+        const instance = getCurrentInstance();
+        const store = instance.proxy.$root.$store
+
+        const title = ref('')
+        const onSubmit = () => {
+            store.dispatch("addTodo", title.value);
         }
 
+        return {
+            onSubmit,
+            title
+        }
     }
 }
 </script>

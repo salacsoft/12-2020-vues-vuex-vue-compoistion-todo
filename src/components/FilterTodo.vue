@@ -16,10 +16,29 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex';
+// import {mapActions} from 'vuex';
+import {getCurrentInstance} from 'vue'
 export default {
     name: "FilterTodos",
-    methods: mapActions(["filterTodos"])
+    // methods: mapActions(["filterTodos"]),
+    setup() {
+
+         //get the instance of root to access the store
+        const instance = getCurrentInstance();
+        const store = instance.proxy.$root.$store
+
+        //this will fetch the original todos in the API and limit the response base onthe selected count
+        const filterTodos = (event) => {
+            store.dispatch("filterTodos", event)
+        }
+        
+        return {
+            filterTodos
+        }
+        
+    }
+
+   
 }
 </script>
 

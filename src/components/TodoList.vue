@@ -1,7 +1,7 @@
 <template>
     <div class="todos">
         <div 
-            v-for="(todo, index) in allTodos" 
+            v-for="(todo, index) in todoList" 
             :key="index" 
             class="todo"
             :class="{'is-complete': todo.completed}" 
@@ -23,26 +23,47 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
+import {getCurrentInstance, onMounted, ref, computed} from 'vue'
 
 export default {
     "name": "TodoList",
-    computed: mapGetters([
-        'allTodos',
-    ]),
-    methods: {
-        ...mapActions(["fetchTodos", "removeTodo", "updateTodo"]),
-        updTodo(todo){
+    setup() {
+        //get the instance of root to access the store
+        const instance = getCurrentInstance();
+        const store = instance.proxy.$root.$store
+        
+        onMounted(async () => {
+            store.dispatch("fetchTodos");
+        })
+
+        //get the list of todos
+        const todoList = computed(() => {
+            return  store.getters.allTodos;
+        });
+
+        //toggle todo to completed and incomplete
+        const updTodo = (todo) => {
             const updatedTodo = {
                 id: todo.id,
                 title: todo.title,
                 completed: !todo.completed
             }
-            this.updateTodo(updatedTodo);
+            store.dispatch("updateTodo", updatedTodo);
         }
-    },
-    created() {
-        this.fetchTodos();
+
+        //remove Todo
+        const removeTodo = (id) => {
+            store.dispatch("removeTodo", id);
+        }
+
+         
+        return {
+            todoList,
+            updTodo,
+            removeTodo
+        }
     }
+
 }
 </script>
 
